@@ -1,0 +1,143 @@
+﻿<!-- Frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .product-form {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="app-name">Product Catalog</h1>
+
+        <div class="product-form">
+            <h3>Add New Product</h3>
+            <form id="addProductForm">
+                <div class="mb-3">
+                    <label for="productName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="productName" required>
+                </div>
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="productDescription" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="productPrice" class="form-label">Price</label>
+                    <input type="number" class="form-control" id="productPrice" step="0.01" min="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </form>
+        </div>
+
+        <h2>Products</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    <!-- Products will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>const apiUrl = 'http://localhost:5275/api/products'; 
+        let defaultCurrency = 'USD';
+
+        // Get app configuration
+        async function getAppConfig() {
+            try {
+                const response = await fetch(`${apiUrl}/config`);
+                if (response.ok) {
+                    const config = await response.json();
+                    document.getElementById('app-name').textContent = config.appName;
+                    defaultCurrency = config.defaultCurrency;
+                }
+            } catch (error) {
+                console.error('Failed to fetch app config:', error);
+            }
+        }
+
+        // Load all products
+        async function loadProducts() {
+            try {
+                const response = await fetch(apiUrl);
+                const products = await response.json();
+
+                const tableBody = document.getElementById('productsTableBody');
+                tableBody.innerHTML = '';
+
+                products.forEach(product => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.description}</td>
+                        <td>${product.price} ${product.currency}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            }
+        }
+
+        // Add a new product
+        async function addProduct(product) {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(product)
+                });
+
+                if (response.ok) {
+                    loadProducts();
+                    document.getElementById('addProductForm').reset();
+                } else {
+                    console.error('Failed to add product:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+            }
+        }
+
+        // Form submit handler
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const product = {
+                name: document.getElementById('productName').value,
+                description: document.getElementById('productDescription').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                currency: defaultCurrency
+            };
+
+            addProduct(product);
+        });
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', function() {
+            getAppConfig();
+            loadProducts();
+        });</script>
+</body>
+</html>
