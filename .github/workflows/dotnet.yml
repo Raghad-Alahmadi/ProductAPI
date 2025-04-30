@@ -18,24 +18,24 @@ jobs:
     steps:
     # Step 1: Checkout the code
     - uses: actions/checkout@v4
-    
+
     # Step 2: Setup .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-        
-    # Step 3: Restore dependencies
+
+    # Step 3: Restore dependencies for the entire solution
     - name: Restore dependencies
-      run: dotnet restore ProductAPI.Test
-      
+      run: dotnet restore ProductAPI.sln
+
     # Step 4: Build the solution
     - name: Build
       run: dotnet build ProductAPI.sln --no-restore --configuration Release
-      
-    # Step 5: Run tests
+
+    # Step 5: Run tests 
     - name: Test
-      run: dotnet test ./ProductAPI.Test/ProductAPI.Test.csproj --filter "Category!=Integration" --verbosity normal --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
+      run: dotnet test ./tests/ProductAPI.Test/ProductAPI.Test.csproj --filter "Category!=Integration" --verbosity normal --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
 
     # Step 6: Publish Test Results
     - name: Publish Test Results
