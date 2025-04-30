@@ -27,7 +27,7 @@ jobs:
         
     # Step 3: Restore dependencies
     - name: Restore dependencies
-      run: dotnet restore ProductAPI.sln
+      run: dotnet restore ProductAPI.Test
       
     # Step 4: Build the solution
     - name: Build
