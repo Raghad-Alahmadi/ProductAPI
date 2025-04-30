@@ -24,7 +24,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore ProductAPI.sln
+      run: dotnet restore ProductAPI
 
     - name: Build
       run: dotnet build ProductAPI.sln --no-restore --configuration Release
