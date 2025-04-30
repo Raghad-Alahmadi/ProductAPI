@@ -31,7 +31,7 @@ jobs:
 
     - name: Test
       run: dotnet test ProductAPI.Test/ProductAPI.Test.csproj --filter "Category!=Integration" --verbosity normal --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
-
+      
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
