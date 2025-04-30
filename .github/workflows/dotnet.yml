@@ -23,7 +23,6 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    # Restore using the solution file
     - name: Restore dependencies
       run: dotnet restore ProductAPI.sln
 
