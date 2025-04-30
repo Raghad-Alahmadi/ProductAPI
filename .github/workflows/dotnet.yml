@@ -3,10 +3,10 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
 
     # Step 5: Run unit tests and collect coverage
     - name: Run tests
-      run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage" --logger trx
+      run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura --logger trx
 
     # Step 6: Upload test results as artifacts
     - name: Upload test results
