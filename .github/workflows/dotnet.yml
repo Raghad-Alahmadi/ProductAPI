@@ -27,7 +27,7 @@ jobs:
       run: dotnet restore ProductAPI
 
     - name: Build
-      run: dotnet build ProductAPI --no-restore --configuration Release
+      run: dotnet build ProductAPI --no-restore --configuration Release --verbosity detailed
 
     - name: Test
       run: dotnet test ProductAPI.Test/ProductAPI.Test.csproj --filter "Category!=Integration" --verbosity normal --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
