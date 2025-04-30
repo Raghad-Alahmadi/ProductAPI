@@ -1,46 +1,45 @@
-name: CI Pipeline
+name: .NET
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
   pull_request:
-    branches:
-      - master
+    branches: [ "master" ]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Step 1: Checkout the code
+    - uses: actions/checkout@v4
+    
+    # Step 2: Setup .NET
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    # Step 3: Restore dependencies
+    - name: Restore dependencies
+      run: dotnet restore ProductAPI.sln
+      
+    # Step 4: Build the solution
+    - name: Build
+      run: dotnet build ProductAPI.sln --no-restore --configuration Release
+      
+    # Step 5: Run tests
+    - name: Test
+      run: dotnet test ./ProductAPI.Test/ProductAPI.Test.csproj --filter "Category!=Integration" --verbosity normal --logger "trx;LogFileName=TestResults.trx" --results-directory "TestResults"
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore 
-
-      - name: Build solution
-        run: dotnet build MyApp.sln --no-restore --configuration Release
-
-      - name: Run tests with coverage
-        run: |
-          dotnet test MyApp.sln --no-build --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --logger:"trx"
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: '**/TestResults/*.trx'
-
-      - name: Upload code coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage
-          path: '**/coverage.cobertura.xml'
+    # Step 6: Publish Test Results
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: TestResults/TestResults.trx
